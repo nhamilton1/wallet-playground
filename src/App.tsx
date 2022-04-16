@@ -1,9 +1,9 @@
-import './App.css';
+import React from 'react';
 import LedgerTest from './components/LedgerTest';
 
 function App() {
   return (
-    <div className="App">
+    <div>
       <LedgerTest />
     </div>
   );

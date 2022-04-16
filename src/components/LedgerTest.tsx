@@ -2,6 +2,7 @@ import Transport from "@ledgerhq/hw-transport";
 import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
 import Btc from "@ledgerhq/hw-app-btc";
 import { useState } from "react";
+import React from "react";
 
 declare global {
   interface Window {
@@ -28,15 +29,9 @@ const LedgerTest = () => {
   const [xpub, setXpub] = useState()
 
   const handleClick = async () => {
-    // const supported: boolean = await TransportWebUSB.isSupported()
-    // console.log(supported)
-
-    // const list = await TransportWebUSB.list()
-    // console.log(list)
-
     const transport = await TransportWebUSB.create();
 
-    //single sig setup
+    // single sig setup
     // const getWalletPublicKey = await btc.getWalletPublicKey("m/84'/0'/0'", { format: "bech32"});
     // const xpub = await btc.getWalletXpub({
     //     path: "m/84'/0'/0'",
@@ -44,11 +39,7 @@ const LedgerTest = () => {
     // })
 
     const btc = new Btc(transport);
-    const getWalletPublicKey = await btc.getWalletPublicKey("m/45'/0'/0'", { format: "p2sh"});
-    
-
     console.log(btc);
-    console.log(getWalletPublicKey);
 
     const xpub = await btc.getWalletXpub({
     path: "m/48'/0'/0'/2'",
@@ -57,9 +48,8 @@ const LedgerTest = () => {
 
     console.log(xpub)
 
-    // const getWalletXpub = await btc.getWalletXpub()
+    // const transportError = TransportWebUSB.e
     // console.log(getWalletXpub);
-
     setTransport(transport);
   };
 
