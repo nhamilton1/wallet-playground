@@ -1,1 +1,1 @@
-Creating a text env for wallets
+Creating a test env for wallets
