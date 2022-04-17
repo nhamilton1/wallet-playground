@@ -1,7 +1,7 @@
 import Transport from "@ledgerhq/hw-transport";
 import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
 import Btc from "@ledgerhq/hw-app-btc";
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 
 declare global {
   interface Window {
@@ -23,24 +23,53 @@ const InitialAddress = {
 
 const LedgerTest = () => {
   const [transport, setTransport] = useState<object>();
-  // const [error, setError] = useState<object>();
+  const [error, setError] = useState<string>("");
   const [address, setAddress] = useState<InitAdd>(InitialAddress);
-  const [xpub, setXpub] = useState("");
+  const [xpub, setXpub] = useState<string>("");
+  const [signature, setSignature] = useState<string>("");
+  const [signError, setSignError] = useState<string>("");
   // const [isLoading, setIsLoading] = useState(false);
 
-  const handleClick = async () => {
-    const transport = await TransportWebUSB.create();
-    const btc = new Btc(transport);
-    console.log(transport);
+  useLayoutEffect(() => {
+    if (transport) {
+      setError("");
+    }
+    if (signature) {
+      setSignError("");
+    }
+  }, [transport, signature]);
 
-    // single sig setup
-    const getWalletPublicKey = await btc.getWalletPublicKey("M/84'/0'/0'/0'", {
-      format: "bech32",
-    });
-    const xpub = await btc.getWalletXpub({
-      path: "m/84'/0'/0'",
-      xpubVersion: 76067358,
-    });
+  const handleClick = async () => {
+    try {
+      const transport = await TransportWebUSB.create();
+      const btc = new Btc(transport);
+      console.log(transport);
+
+      // single sig setup
+      const getWalletPublicKey = await btc.getWalletPublicKey(
+        "M/84'/0'/0'/0'",
+        {
+          format: "bech32",
+        }
+      );
+      const xpub = await btc.getWalletXpub({
+        path: "m/84'/0'/0'",
+        xpubVersion: 76067358,
+      });
+
+      console.log(getWalletPublicKey);
+      setAddress({
+        ...address,
+        bitcoinAddress: getWalletPublicKey.bitcoinAddress,
+        chainCode: getWalletPublicKey.chainCode,
+        publicKey: getWalletPublicKey.publicKey,
+      });
+      setXpub(xpub);
+      setTransport(transport);
+    } catch (err: any) {
+      setError(err.message);
+      console.error(err);
+    }
 
     // multi sig setup
     // const getWalletPublicKey = await btc.getWalletPublicKey("m/48'/0'/0'/2'");
@@ -48,16 +77,6 @@ const LedgerTest = () => {
     //   path: "m/48'/0'/0'/2'",
     //   xpubVersion: 76067358,
     // });
-
-    console.log(getWalletPublicKey);
-    setAddress({
-      ...address,
-      bitcoinAddress: getWalletPublicKey.bitcoinAddress,
-      chainCode: getWalletPublicKey.chainCode,
-      publicKey: getWalletPublicKey.publicKey,
-    });
-    setXpub(xpub);
-    setTransport(transport);
   };
 
   const handleSignClick = async () => {
@@ -72,14 +91,18 @@ const LedgerTest = () => {
           "hex"
         ).toString("base64");
         console.log("Signature : " + signature);
+        setSignature(signature);
         return signature;
       })
-      .catch((ex) => console.log(ex));
+      .catch((e) => {
+        setSignError(e.message);
+        console.error(e);
+      });
   };
 
   return (
     <div className="flex justify-center items-center flex-col ">
-      <div>
+      <div className="flex justify-center items-center flex-col m-10">
         <h1>Ledger Test</h1>
         <button
           className="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
@@ -88,6 +111,11 @@ const LedgerTest = () => {
         >
           Create
         </button>
+        {error ? (
+          <div className="m-5">
+            <p className="text-red-500">{error}</p>{" "}
+          </div>
+        ) : null}
       </div>
       {!transport && !xpub ? (
         ""
@@ -115,9 +143,9 @@ const LedgerTest = () => {
           </div>
         </div>
       )}
-      <div>
-        <h2 className="underline">Sign Message Here</h2>
-        <div>
+      <div className="flex justify-center items-center flex-col">
+        <h2>Sign Message Here</h2>
+        <div className="flex justify-center items-center flex-col">
           <button
             className="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
             type="button"
@@ -125,7 +153,22 @@ const LedgerTest = () => {
           >
             Sign Message
           </button>
+          {signError ? (
+            <div className="m-5">
+              <p className="text-red-500">{signError}</p>{" "}
+            </div>
+          ) : null}
         </div>
+        {!signature ? (
+          ""
+        ) : (
+          <div className="flex flex-row justify-center ">
+            <div className="mt-10 break-all w-80">
+              <h2 className="underline">Signature</h2>
+              <p>{!signature ? "" : signature}</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
