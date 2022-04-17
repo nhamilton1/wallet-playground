@@ -21,7 +21,7 @@ const InitialAddress = {
   publicKey: "",
 };
 
-const LedgerTest = () => {
+const LedgerTest: React.FC = () => {
   const [transport, setTransport] = useState<object>();
   const [error, setError] = useState<string>("");
   const [address, setAddress] = useState<InitAdd>(InitialAddress);
@@ -101,10 +101,10 @@ const LedgerTest = () => {
   };
 
   return (
-    <div className="flex justify-center items-start flex-col mt-7 w-full">
+    <div className="flex justify-center items-center flex-col mt-7 w-full">
       <div className="flex items-center flex-col justify-center">
         <div>
-          <h1>Transport</h1>
+          <h1 className="text-center">Transport</h1>
           <button
             className="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
             type="button"
