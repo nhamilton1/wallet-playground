@@ -3,7 +3,7 @@ import LedgerTest from './components/LedgerTest';
 
 function App() {
   return (
-    <div>
+    <div className='flex flex-col items-center w-full h-full'>
       <LedgerTest />
     </div>
   );
