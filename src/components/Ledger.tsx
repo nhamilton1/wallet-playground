@@ -21,7 +21,7 @@ const InitialAddress = {
   publicKey: "",
 };
 
-const LedgerTest: React.FC = () => {
+const Ledger: React.FC = () => {
   const [transport, setTransport] = useState<object>();
   const [error, setError] = useState<string>("");
   const [address, setAddress] = useState<InitAdd>(InitialAddress);
@@ -178,4 +178,4 @@ const LedgerTest: React.FC = () => {
   );
 };
 
-export default LedgerTest;
+export default Ledger;

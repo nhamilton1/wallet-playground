@@ -1,6 +1,6 @@
 import Trezor from "components/Trezor";
 import React from "react";
-import LedgerTest from "./components/LedgerTest";
+import Ledger from "./components/Ledger";
 
 function App() {
   return (
@@ -8,7 +8,7 @@ function App() {
       <div>
         <div className="flex flex-col justify-center items-center">
           <h1>Ledger</h1>
-          <LedgerTest />
+          <Ledger />
         </div>
         <div className="flex flex-col justify-center items-center">
           <h1>Trezor</h1>
