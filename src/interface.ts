@@ -20,3 +20,7 @@ export interface initSignInterface {
   address: string;
   signature: string;
 }
+
+export interface InitAdd {
+  bitcoinAddress: string;
+}

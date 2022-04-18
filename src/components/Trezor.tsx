@@ -4,7 +4,7 @@ import {
   initBc1Interface,
   initPubKeyInterface,
   initSignInterface,
-} from "./interface";
+} from "../interface";
 
 const initPubkey = {
   chainCode: "",
