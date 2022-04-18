@@ -5,6 +5,7 @@ import React, { useLayoutEffect, useState } from "react";
 import { InitAdd } from "../interface";
 import BtcOld from "@ledgerhq/hw-app-btc/lib/BtcOld";
 
+
 declare global {
   export interface Window {
     ledgerTransport: Transport;
@@ -40,19 +41,6 @@ const Ledger: React.FC = () => {
       const transport = await TransportWebUSB.create();
       // had to use BtcOld becuase Btc was not letting me non standard path to find address
       const btc = new BtcOld(transport);
-
-      // // have to use bitcoin mainnet
-      // // single sig setup
-      // const getWalletPublicKey = await btc.getWalletPublicKey(
-      //   "84'/0'/0'/0'",
-      //   {
-      //     format: "bech32",
-      //   }
-      // );
-      // const xpub = await btc.getWalletXpub({
-      //   path: "84'/0'/0'",
-      //   xpubVersion: 76067358,
-      // });
 
       // have to install bitcoin testnet on ledger
       // 48'/1'/0'/2'/0/0

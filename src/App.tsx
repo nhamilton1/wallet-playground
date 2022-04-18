@@ -1,4 +1,4 @@
-import Trezor from "components/Trezor";
+import Trezor from "./components/Trezor";
 import React from "react";
 import Ledger from "./components/Ledger";
 
