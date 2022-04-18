@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
 import TrezorConnect from "trezor-connect";
-
-interface initPubKeyInterface {
-  chainCode: string;
-  childNum: number;
-  depth: number;
-  fingerprint: number;
-  publicKey: string;
-  serializedPath: string;
-  xpub: string;
-  xpubSegwit: string;
-  path?: number[];
-}
+import {
+  initBc1Interface,
+  initPubKeyInterface,
+  initSignInterface,
+} from "./interface";
 
 const initPubkey = {
   chainCode: "",
@@ -25,22 +18,11 @@ const initPubkey = {
   path: [],
 };
 
-interface initBc1Interface {
-  address: string;
-  serializedPath: string;
-  path: number[];
-}
-
 const initBc1 = {
   address: "",
   serializedPath: "",
   path: [],
 };
-
-interface initSignInterface {
-  address: string;
-  signature: string;
-}
 
 const initSign = {
   address: "",
@@ -62,11 +44,28 @@ const Trezor: React.FC = () => {
     });
   }, []);
 
+  /*
+        path: [
+          (84 | 0x80000000) >>> 0,
+          (0 | 0x80000000) >>> 0,
+          (0 | 0x80000000) >>> 0,
+          0,
+          0,
+        ],
+  */
+
   const handleClick = async () => {
     try {
       const getPubKey = await TrezorConnect.getPublicKey({
-        path: "m/84'/0'/0'/0'",
-        coin: "bitcoin",
+        path: [
+          (48 | 0x80000000) >>> 0,
+          (1 | 0x80000000) >>> 0,
+          (0 | 0x80000000) >>> 0,
+          (2 | 0x80000000) >>> 0,
+          0,
+          0,
+        ],
+        coin: "Testnet",
       });
 
       if (getPubKey.success) {
@@ -87,16 +86,14 @@ const Trezor: React.FC = () => {
       const getAddress = await TrezorConnect.getAddress({
         //https://github.com/trezor/connect/blob/develop/docs/methods/path.md
         path: [
-          (84 | 0x80000000) >>> 0,
+          (48 | 0x80000000) >>> 0,
+          (1 | 0x80000000) >>> 0,
           (0 | 0x80000000) >>> 0,
-          (0 | 0x80000000) >>> 0,
+          (2 | 0x80000000) >>> 0,
           0,
           0,
         ],
-        coin: "bitcoin",
       });
-
-      console.log(getAddress);
 
       if (getAddress.success) {
         setBc1({
@@ -112,18 +109,25 @@ const Trezor: React.FC = () => {
     }
   };
 
+  // non standard path
+  // m/48'/1'/0'/2'/0/0
+  // 48 is multisig bech32
+  // 1 is for testnet
+
   const handleSignature = async () => {
     try {
       const signMessage = await TrezorConnect.signMessage({
+        //https://github.com/trezor/connect/blob/develop/docs/methods/path.md
         path: [
-          (84 | 0x80000000) >>> 0,
+          (48 | 0x80000000) >>> 0,
+          (1 | 0x80000000) >>> 0,
           (0 | 0x80000000) >>> 0,
-          (0 | 0x80000000) >>> 0,
+          (2 | 0x80000000) >>> 0,
           0,
           0,
         ],
         message: "test",
-        coin: "bitcoin",
+        coin: "Testnet",
       });
 
       if (signMessage.success) {
@@ -133,7 +137,6 @@ const Trezor: React.FC = () => {
         });
         setSignatureSuccess(true);
       }
-      console.log(signature);
     } catch (err) {
       console.error(err);
     }
@@ -141,38 +144,36 @@ const Trezor: React.FC = () => {
 
   return (
     <div>
-      <div className="flex justify-center items-center flex-row mt-10">
-        <div className="flex justify-evenly items-center flex-row w-full">
-          <div className="flex justify-center items-center flex-col m-1">
-            <h1>Transport</h1>
-            <button
-              className="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-              type="button"
-              onClick={handleClick}
-            >
-              Get pubkey
-            </button>
-          </div>
-          <div className="flex justify-center items-center flex-col m-1">
-            <h1>bc1</h1>
-            <button
-              className="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-              type="button"
-              onClick={handleGetAddress}
-            >
-              Get bc1 address
-            </button>
-          </div>
-          <div className="flex justify-center items-center flex-col m-1">
-            <h1>Sign Msg</h1>
-            <button
-              className="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-              type="button"
-              onClick={handleSignature}
-            >
-              Sign
-            </button>
-          </div>
+      <div className="flex justify-evenly items-center flex-row w-full">
+        <div className="flex justify-center items-center flex-col p-1">
+          <h1>Transport</h1>
+          <button
+            className="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+            type="button"
+            onClick={handleClick}
+          >
+            Get pubkey
+          </button>
+        </div>
+        <div className="flex justify-center items-center flex-col p-1">
+          <h1>bc1</h1>
+          <button
+            className="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+            type="button"
+            onClick={handleGetAddress}
+          >
+            Get bc1 address
+          </button>
+        </div>
+        <div className="flex justify-center items-center flex-col p-1">
+          <h1>Sign Msg</h1>
+          <button
+            className="px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+            type="button"
+            onClick={handleSignature}
+          >
+            Sign
+          </button>
         </div>
       </div>
       <div>
@@ -193,7 +194,9 @@ const Trezor: React.FC = () => {
               <p>{bc1.address}</p>
             </div>
           )}
-          {signatureSuccess === false ? ( "" ) : (
+          {signatureSuccess === false ? (
+            ""
+          ) : (
             <div className="break-all w-3/4 p-3">
               <h2 className="underline">Signature</h2>
               <p>{signature.signature}</p>
