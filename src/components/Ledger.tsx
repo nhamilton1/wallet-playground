@@ -1,10 +1,8 @@
 import Transport from "@ledgerhq/hw-transport";
 import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
-import Btc from "@ledgerhq/hw-app-btc";
 import React, { useLayoutEffect, useState } from "react";
 import { InitAdd } from "../interface";
 import BtcOld from "@ledgerhq/hw-app-btc/lib/BtcOld";
-
 
 declare global {
   export interface Window {
@@ -39,26 +37,29 @@ const Ledger: React.FC = () => {
   const handleClick = async () => {
     try {
       const transport = await TransportWebUSB.create();
-      // had to use BtcOld becuase Btc was not letting me non standard path to find address
-      const btc = new BtcOld(transport);
+      // have to use BtcOld becuase Btc was not letting me use non standard path to find address
+      // also BtcOld lets me assign the corect xpubVersion to get right xpub
+      // testnet P2WSH xpubVersion = 39277699
+      const oldBtc = new BtcOld(transport);
 
       // have to install bitcoin testnet on ledger
       // 48'/1'/0'/2'/0/0
-      const getWalletPublicKey = await btc.getWalletPublicKey(
-        "48'/1'/0'/2'/0/0"
+      const getWalletPublicKey = await oldBtc.getWalletPublicKey(
+        "M/48'/1'/0'/2'/0/0",
+        {
+          format: "bech32",
+        }
       );
-      console.log(getWalletPublicKey);
+
+      const getXpub = await oldBtc.getWalletXpub({
+        path: "48'/1'/0'/2'",
+        xpubVersion: 39277699,
+      });
 
       setAddress({
         ...address,
         bitcoinAddress: getWalletPublicKey.bitcoinAddress,
       });
-
-      const getXpub = await btc.getWalletXpub({
-        path: "48'/1'/0'/2'/0/0",
-        xpubVersion: 70617039,
-      });
-
       setXpub(getXpub);
       setTransport(transport);
     } catch (err: any) {
@@ -71,7 +72,7 @@ const Ledger: React.FC = () => {
     setSignature("");
     setSignedMessageClicked(true);
     const transport = await TransportWebUSB.create();
-    const btc = new Btc(transport);
+    const btc = new BtcOld(transport);
     try {
       const signMessage = await btc.signMessageNew(
         "48'/1'/0'/2'/0/0",
@@ -119,7 +120,9 @@ const Ledger: React.FC = () => {
           ""
         ) : (
           <div>
-            <p>Please follow instructions on your ledger device</p>
+            <p className="text-red-500">
+              Please follow instructions on your ledger device
+            </p>
           </div>
         )}
         {!transport && !xpub ? (

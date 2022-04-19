@@ -1,32 +1,30 @@
 {
   "compilerOptions": {
-    "target": "es5", // Specify ECMAScript target version
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ], // List of library files to be included in the compilation
-    "allowJs": true, // Allow JavaScript files to be compiled
-    "skipLibCheck": true, // Skip type checking of all declaration files
-    "esModuleInterop": true, // Disables namespace imports (import * as fs from "fs") and enables CJS/AMD/UMD style imports (import fs from "fs")
-    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
-    "strict": true, // Enable all strict type checking options
-    "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file.
-    "module": "esnext", // Specify module code generation
-    "moduleResolution": "node", // Resolve modules using Node.js style
-    "isolatedModules": true, // Unconditionally emit imports for unresolved files
-    "resolveJsonModule": true, // Include modules imported with .json extension
-    "noEmit": true, // Do not emit output (meaning do not compile code, only perform type checking)
-    "jsx": "react", // Support JSX in .tsx files
-    "sourceMap": true, // Generate corrresponding .map file
-    "declaration": true, // Generate corresponding .d.ts file
-    "noUnusedLocals": true, // Report errors on unused locals
-    "noUnusedParameters": true, // Report errors on unused parameters
-    "incremental": true, // Enable incremental compilation by reading/writing information from prior compilations to a file on disk
-    "noFallthroughCasesInSwitch": true // Report errors for fallthrough cases in switch statement
+    "noImplicitAny": false /* Raise error on expressions and declarations with an implied 'any' type. */,
+    "allowSyntheticDefaultImports": true /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */,
+    "sourceMap": true /* Generates corresponding '.map' file. */,
+    "target": "es2015" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
+    "jsx": "react" /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */,
+    "types": [
+      "react",
+      "node"
+    ] /* Type declaration files to be included in compilation. */,
+    "module": "esNext" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
+    "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
+    "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
+    "declaration": false /* Generates corresponding '.d.ts' file. */,
+    "removeComments": true /* Do not emit comments to output. */,
+    "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+    "noUnusedLocals": false /* Report errors on unused locals. */,
+    "strict": true /* Enable all strict type-checking options. */,
+    "outDir": "dist" /* Redirect output structure to the directory. */,
+    "baseUrl": "src" /* Base directory to resolve non-absolute module names. */,
+    "typeRoots": [
+      "./types",
+      "node_modules/@types"
+    ] /* List of folders to include type definitions from. */,
+    "strictNullChecks": true /* Enable strict null checks. */,
+    "allowJs": true /* Allow javascript files to be compiled. */
   },
-  "include": [
-    "src/**/*" // *** The files TypeScript should type check ***
-  ],
-  "exclude": ["node_modules", "build"] // *** The files to not type check ***
+  "exclude": ["dist", "node_modules"]
 }
