@@ -93,7 +93,7 @@ const Ledger: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center flex-col mt-7 w-full">
-      <div className="flex justify-evenly items-center flex-row w-full">
+      <div className="flex justify-center items-center flex-row w-full">
         <div>
           <h1 className="text-center">Transport</h1>
           <button

@@ -29,6 +29,8 @@ const initSign = {
   signature: "",
 };
 
+const email: string = process.env.REACT_APP_EMAIL as string;
+
 const Trezor: React.FC = () => {
   const [pubKey, setPubKey] = useState<initPubKeyInterface>(initPubkey);
   const [success, setSuccess] = useState(false);
@@ -39,11 +41,13 @@ const Trezor: React.FC = () => {
 
   useEffect(() => {
     TrezorConnect.manifest({
-      email: "",
-      appUrl: "",
+      email: email,
+      appUrl: "http://localhost:3000/",
     });
   }, []);
 
+  //https://github.com/trezor/connect/blob/develop/docs/methods/path.md
+  //single sig
   /*
         path: [
           (84 | 0x80000000) >>> 0,
@@ -54,10 +58,24 @@ const Trezor: React.FC = () => {
         ],
   */
 
-  const handleClick = async () => {
-    try {
-      const getPubKey = await TrezorConnect.getPublicKey({
-        path: [
+  // non standard path
+  // m/48'/1'/0'/2'/0/0
+  // 48 is multisig bech32
+  // 1 is for testnet
+
+  // "m/84'/1'/0'/0/0"
+  // 84 is bech32 single sig
+  // 1 is for testnet
+  // had to remove '2, wouldnt work with it on
+
+  // for getting the correct xpub, i had to use path: "m/84'/1'/0'"
+  // otherwise i recieved the wrong xpub, m/84'/1'/0'/0/0, didnt work, same with m/84'/1'/0'/2'/0/0"
+
+
+
+  //multi sig
+  /* 
+    path: [
           (48 | 0x80000000) >>> 0,
           (1 | 0x80000000) >>> 0,
           (0 | 0x80000000) >>> 0,
@@ -66,6 +84,11 @@ const Trezor: React.FC = () => {
           0,
         ],
         coin: "Testnet",
+  */
+  const handleClick = async () => {
+    try {
+      const getPubKey = await TrezorConnect.getPublicKey({
+        path: "m/84'/1'/0'",
       });
 
       if (getPubKey.success) {
@@ -84,15 +107,8 @@ const Trezor: React.FC = () => {
   const handleGetAddress = async () => {
     try {
       const getAddress = await TrezorConnect.getAddress({
-        //https://github.com/trezor/connect/blob/develop/docs/methods/path.md
-        path: [
-          (48 | 0x80000000) >>> 0,
-          (1 | 0x80000000) >>> 0,
-          (0 | 0x80000000) >>> 0,
-          (2 | 0x80000000) >>> 0,
-          0,
-          0,
-        ],
+        path: "m/84'/1'/0'/0/0",
+        coin: "Testnet",
       });
 
       if (getAddress.success) {
@@ -109,23 +125,10 @@ const Trezor: React.FC = () => {
     }
   };
 
-  // non standard path
-  // m/48'/1'/0'/2'/0/0
-  // 48 is multisig bech32
-  // 1 is for testnet
-
   const handleSignature = async () => {
     try {
       const signMessage = await TrezorConnect.signMessage({
-        //https://github.com/trezor/connect/blob/develop/docs/methods/path.md
-        path: [
-          (48 | 0x80000000) >>> 0,
-          (1 | 0x80000000) >>> 0,
-          (0 | 0x80000000) >>> 0,
-          (2 | 0x80000000) >>> 0,
-          0,
-          0,
-        ],
+        path: "m/84'/1'/0'/0/0",
         message: "test",
         coin: "Testnet",
       });
@@ -144,7 +147,7 @@ const Trezor: React.FC = () => {
 
   return (
     <div>
-      <div className="flex justify-evenly items-center flex-row w-full">
+      <div className="flex justify-center items-center flex-row w-full">
         <div className="flex justify-center items-center flex-col p-1">
           <h1>Transport</h1>
           <button
@@ -183,7 +186,7 @@ const Trezor: React.FC = () => {
           ) : (
             <div className="break-all w-3/4 p-3">
               <h2 className="underline">Xpub</h2>
-              <p>{pubKey.xpub}</p>
+              <p>{pubKey.xpubSegwit}</p>
             </div>
           )}
           {bc1Success === false ? (
